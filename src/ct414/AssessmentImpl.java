@@ -8,16 +8,14 @@ public class AssessmentImpl implements Assessment {
 	private String information;
 	private Date ClosingDate;
 	private List<Question> questions;
-	private Question question;
 	private int answer;
 	private int AssociatedId;
 	
-	public AssessmentImpl(String information, Date Closing, List quest, Question question, int answer, int ID){
+	public AssessmentImpl(String information, Date Closing, List quest, int answer, int ID){
 		this.information = information;
 		this.ClosingDate = Closing;
 		this.questions = quest;
-		this.question = question;
-		this.answer = answer;
+		this.answer =answer;
 		this.AssociatedId = ID;
 	}
 	

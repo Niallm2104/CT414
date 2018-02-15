@@ -33,7 +33,7 @@ public class ExamEngine implements ExamServer {
                 UnauthorizedAccess, RemoteException {
     	int min = 0;
     	int max = 10000000;
-    	for(Student s : studs){
+    	for(Student s: studs){
     		if(s.getId() == studentid && s.getPassword() == password){
     			 
     			    int randomNum = rand.nextInt((max - min) + 1) + min;		//Generate a random number and assign it to
@@ -99,17 +99,55 @@ public class ExamEngine implements ExamServer {
         }
 
     }
+    
+    private static Assessment[] generateAssessments(Student stu1){
+    	Assessment history = new AssessmentImpl("History", new Date(new Date().getTime() +1000)
+    			, 
+    			new List<Question>(){
+    		new QuestionImpl(1, "In what year did TeamSlicedBread create the H.E.L.M.E.T?", 
+    				new String[]{"2013", "2014", "2017"}),
+    		new QuestionImpl(2, "What year is it now?",
+    				new String[]{"2012","2018","2019"})}
+    		, 1, 13500527);
+    	return new Assessment[]{history};
+    }
+   
 
 
     public static void main(String[] args) {
+  
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
         try {
+        	
+        	Student s1 = new Student("yellow", 1);
+            Assessment[] assessments = generateAssessments(s1);
+
+            ExamEngine engine = new ExamEngine(
+                    new Student[]{new Student("yellow", 1)},
+                    assessments
+            );
+
+            int token = engine.login(s1.getId(),"yellow" );
+            Question History = engine.getAvailableSummary(token, s1.getId()).get(0).getQuestion(1);
+            System.out.println(History);
+            
+            Assessment HistoryAssessment = engine.getAssessment(token, s1.getId(), "History");
+            Question Q1 = HistoryAssessment.getQuestion(1);
+            System.out.println(Q1);
+            System.out.println(Q1.getAnswerOptions()[HistoryAssessment.getSelectedAnswer(1)]);
+            HistoryAssessment.selectAnswer(1, 2);
+            System.out.println(Q1.getAnswerOptions()[HistoryAssessment.getSelectedAnswer(1)]);
+            engine.submitAssessment(token, s1.getId(), HistoryAssessment);
+            
+        	
+        	
+        	
             String name = "ExamServer";
-            ExamServer engine = new ExamEngine(studs, assessm);
+            ExamServer engine1 = new ExamEngine(studs, assessm);
             ExamServer stub =
-                (ExamServer) UnicastRemoteObject.exportObject(engine, 0);
+                (ExamServer) UnicastRemoteObject.exportObject(engine1, 0);
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(name, stub);
             System.out.println("ExamEngine bound");
